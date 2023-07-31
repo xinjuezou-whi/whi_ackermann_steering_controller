@@ -1,0 +1,9 @@
+<library path="libwhi_ackermann_steering_controller">
+
+  <class name="whi_ackermann_steering_controller/AckermannSteeringController" type="ackermann_steering_controller::AckermannSteeringController" base_class_type="controller_interface::ControllerBase">
+    <description>
+      The AckermannSteeringController tracks velocity commands. It expects 1 VelocityJointInterface and 1 PositionJointInterfece types of hardware interfaces.
+    </description>
+  </class>
+
+</library>
