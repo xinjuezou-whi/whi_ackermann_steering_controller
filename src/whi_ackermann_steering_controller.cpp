@@ -41,7 +41,7 @@
 #include <tf/transform_datatypes.h>
 #include <urdf_parser/urdf_parser.h>
 
-#include <whi_ackermann_steering_controller/ackermann_steering_controller.h>
+#include <whi_ackermann_steering_controller/whi_ackermann_steering_controller.h>
 
 static double euclideanOfVectors(const urdf::Vector3& vec1, const urdf::Vector3& vec2)
 {
