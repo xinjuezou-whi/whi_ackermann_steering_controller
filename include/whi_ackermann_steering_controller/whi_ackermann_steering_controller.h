@@ -49,6 +49,7 @@
 #include <realtime_tools/realtime_buffer.h>
 #include <realtime_tools/realtime_publisher.h>
 #include <tf/tfMessage.h>
+#include <geometry_msgs/TwistStamped.h>
 
 namespace ackermann_steering_controller{
 
@@ -128,6 +129,8 @@ namespace ackermann_steering_controller{
     std::shared_ptr<realtime_tools::RealtimePublisher<nav_msgs::Odometry> > odom_pub_;
     std::shared_ptr<realtime_tools::RealtimePublisher<tf::tfMessage> > tf_odom_pub_;
     Odometry odometry_;
+    // publish executed commands
+    std::shared_ptr<realtime_tools::RealtimePublisher<geometry_msgs::TwistStamped> > cmd_vel_pub_;
 
     /// Wheel separation, wrt the midpoint of the wheel width:
     double wheel_separation_h_;
@@ -154,6 +157,9 @@ namespace ackermann_steering_controller{
 
     /// Whether to publish odometry to tf or not:
     bool enable_odom_tf_;
+
+    // publish executed velocity:
+    bool publish_cmd_{ false };
 
     /// Number of wheel joints:
     size_t wheel_joints_size_;

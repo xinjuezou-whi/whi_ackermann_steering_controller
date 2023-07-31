@@ -194,6 +194,9 @@ namespace ackermann_steering_controller{
     controller_nh.param("enable_odom_tf", enable_odom_tf_, enable_odom_tf_);
     ROS_INFO_STREAM_NAMED(name_, "Publishing to tf is " << (enable_odom_tf_?"enabled":"disabled"));
 
+    controller_nh.param("publish_cmd", publish_cmd_, publish_cmd_);
+    ROS_INFO_STREAM_NAMED(name_, "publishing executed twist command is " << (publish_cmd_ ? "enabled" : "disabled"));
+
     // Velocity and acceleration limits:
     controller_nh.param("linear/x/has_velocity_limits"    , limiter_lin_.has_velocity_limits    , limiter_lin_.has_velocity_limits    );
     controller_nh.param("linear/x/has_acceleration_limits", limiter_lin_.has_acceleration_limits, limiter_lin_.has_acceleration_limits);
@@ -218,6 +221,12 @@ namespace ackermann_steering_controller{
     // If either parameter is not available, we need to look up the value in the URDF
     bool lookup_wheel_separation_h = !controller_nh.getParam("wheel_separation_h", wheel_separation_h_);
     bool lookup_wheel_radius = !controller_nh.getParam("wheel_radius", wheel_radius_);
+
+    if (publish_cmd_)
+    {
+      cmd_vel_pub_.reset(new realtime_tools::RealtimePublisher<geometry_msgs::TwistStamped>(
+        controller_nh, "cmd_vel_out", 100));
+    }
 
     if (!setOdomParamsFromUrdf(root_nh,
                                rear_wheel_name,
@@ -328,6 +337,15 @@ namespace ackermann_steering_controller{
 
     last1_cmd_ = last0_cmd_;
     last0_cmd_ = curr_cmd;
+
+    // publish executed limited velocity
+    if (publish_cmd_ && cmd_vel_pub_ && cmd_vel_pub_->trylock())
+    {
+      cmd_vel_pub_->msg_.header.stamp = time;
+      cmd_vel_pub_->msg_.twist.linear.x = curr_cmd.lin;
+      cmd_vel_pub_->msg_.twist.angular.z = curr_cmd.ang;
+      cmd_vel_pub_->unlockAndPublish();
+    }
 
     // Set Command
     const double wheel_vel = curr_cmd.lin/wheel_radius_; // omega = linear_vel / radius
